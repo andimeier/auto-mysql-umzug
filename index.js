@@ -14,13 +14,25 @@ const Umzug = require('umzug');
 const Sequelize = require('sequelize');
 const path = require('path');
 
+// default values for options
+
 let migrationTableName = '_migrations';
-let migrationsDir = 'migrations'; // default
+let migrationDir = 'migrations'; // default
+
+let dbOptions = {
+    dialect: 'mysql',
+
+    pool: {
+        max: 5,
+        min: 0,
+        idle: 10000
+    },
+    logging: false
+};
 
 // TODO: mysql2 needed, ditch mysql instead (now both are in node_modules) 
 // TODO: warn when executed migrations are there which are not known to the software (which
 // indicates a db revert should be done)
-// TODO: extract migrate as a npm module
 
 let umzug;
 let sequelize;
@@ -28,8 +40,8 @@ let sequelize;
 /**
  * initialize Sequelize
  * 
- * @param opt {object} config object, consisiting of: { dbName, dbUser, dbPass, dbType}
- *   dbType is the Sequelize DB type, it is optional, with 'mysql' as default
+ * @param opt {object} config object, consisiting of: { dbName, dbUser, dbPass} and 
+ *    any additional options which are known to Sequelize's constructur
  */
 function initSequelize(opt) {
 
@@ -44,31 +56,22 @@ function initSequelize(opt) {
     if (!opt.dbPass) {
         throw new Error('missing mandatory config parameter dbPass');
     }
-    opt.migrationDir = path.resolve(path.dirname(require.main.filename), (opt.migrationDir || migrationsDir));
 
-    let sequelizeOptions = {
-        dialect: opt.dbType || 'mysql',
+    // overwrite default options
 
-        pool: {
-            max: 5,
-            min: 0,
-            idle: 10000
-        },
-        logging: false
-    };
+    migrationDir = path.resolve(path.dirname(require.main.filename), (opt.migrationDir || migrationDir));
+
+    dbOptions = Object.assign(dbOptions, (opt.dbOptions || {}));
 
     if (opt.migrationTable) {
         migrationTableName = opt.migrationTable;
     }
 
-    if ( opt.dbOptions) {
-        sequelizeOptions = Object.assign(sequelizeOptions, opt.dbOptions);
-    }
+    // setup migrations storage backend
 
-    sequelize = new Sequelize(opt.dbName, opt.dbUser, opt.dbPass, sequelizeOptions);
+    sequelize = new Sequelize(opt.dbName, opt.dbUser, opt.dbPass, dbOptions);
 
-    // remember migration directory in module
-    migrationDir = opt.migrationDir;
+    // setup Umzug
 
     umzug = new Umzug({
         storage: 'sequelize',
@@ -85,7 +88,7 @@ function initSequelize(opt) {
                     throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
                 }
             ],
-            path: opt.migrationDir,
+            path: migrationDir,
             pattern: /\.js$/
         },
     
@@ -94,7 +97,6 @@ function initSequelize(opt) {
         },
     });
 }
-
 
 
 /**
