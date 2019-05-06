@@ -18,7 +18,7 @@ is resolved, continue starting up your application.
 
 Like this:
 
-```
+```js
 // before starting the app, perform database migration steps, if any
 const migrate = require("auto-mysql=umzug")({
     dbName: DB_DATABASE,
@@ -27,16 +27,15 @@ const migrate = require("auto-mysql=umzug")({
   });
   
   // migrate db if it is not up to date
-  migrate
-    .execute()
-    .then(performedMigrations => {
-      logger.info(`successful migration: ${performedMigrations}`);
-      startApp(); // here, e.g. the Express app is being started
+  migrate.execute()
+    .then(() => {
+      logger.info(`migration was successful`);
+      startApp(); // at this point - after successful migration - start your application
     })
     .catch(err => {
       logger.error(`error at migration: ${err}`);
 
-	  // don't start application
+      // don't start application
       process.exit(1);
     });
 ```
@@ -50,9 +49,9 @@ The database table in which the installed migrations are being tracked, is calle
 The possible options are:
 
 * `dbName` ... name of the database
-* `dbUser` ... username of database user. User must have the necessary privileges to alter the database. For instance, the user must be allowed to create the migrations metadata table - and every migration you will create.
-* `dbPass` ... password of database user
-* `dbOptions` ... additional database options. These options are passed through to [Sequelize](https://github.com/sequelize/sequelize) backend, so all options which are understood by *Sequelize*'s options property for the constructor are possible.
+* `dbUser` ... username of the database user. User must have the necessary privileges to alter the database. For instance, the user must be allowed to create the migrations metadata table - and every migration you will create.
+* `dbPass` ... password of the database user
+* `dbOptions` ... an object containing additional database options. These options are passed through to [Sequelize](https://github.com/sequelize/sequelize) backend, so all options which are understood by *Sequelize*'s options property for the constructor are possible.
 * `migrationDir` ... folder containing the migration files associated with the software version (see [umzug](https://www.npmjs.com/package/umzug) for details on migration files). It can be an absolute or relative path. In case of a relative path, it will be resolved relative to the application's main folder (`path.dirname(require.main.filename)`).  set the name of the directory which contains the migration files. If not set, the default name for the migration folder is `migrations`.
 * `migrationTable` ... name of the table which stores the executed migrations. Default is `_migrations`.
 
