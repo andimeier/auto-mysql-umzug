@@ -1,59 +1,21 @@
 {
-  "name": "hermes-backend",
-  "description": "Hermes packaging tool - this is the REST backend",
-  "version": "1.2.7",
-  "main": "app/hermes_server.js",
+  "name": "auto-mysql-umzug",
+  "description": "Small wrapper to integrate umzug as easy as possible in your app",
+  "version": "0.0.1",
+  "author": "Alexander Eck-Zimmer",
+  "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://atvulicl1.ad001.siemens.net/git/bm/tools/hermes-backend"
+    "url": "https://github.com/andimeier/auto-mysql-umzug"
   },
   "engines": {
     "node": ">=6.14.3"
   },
   "dependencies": {
-    "body-parser": "^1.18.3",
-    "cas-authentication-ajax": "^0.0.10",
-    "change-case": "~3.0.2",
-    "cookie-parser": "^1.4.3",
-    "cookie-session": "^2.0.0-beta.3",
-    "express": "^4.16.3",
-    "helmet": "^3.13.0",
-    "joi": "^10.6.0",
-    "jszip": "^3.1.5",
-    "lodash": "^4.17.10",
-    "md5-file": "^3.2.3",
-    "moment": "^2.22.2",
-    "multer": "^1.3.1",
-    "mysql": "~2.16.0",
-    "path": "^0.12.7",
-    "promise.prototype.finally": "^3.1.0",
-    "winston": "~0.7.3",
-    "xml2js": "^0.4.19",
-    "xmlbuilder": "^4.1.0"
-  },
-  "scripts": {
-    "start": "title hermes-backend && node app/hermes_server.js",
-    "inspect": "title \"hermes-backend inspect mode\" && node --inspect app/hermes_server.js",
-    "inspect-wait": "title \"hermes-backend inspect mode\" && node --inspect-brk app/hermes_server.js",
-    "api-doc": "node node_modules/aglio/bin/aglio.js -i doc/Hermes_API.apib -o doc/api/hermes-api.html",
-    "api-live-preview": "node node_modules/aglio/bin/aglio.js -i doc/Hermes_API.apib -s -p 3004",
-    "test": "mocha test/api/**/*.test.js",
-    "build": "sh deploy/build.sh",
-    "package": "deploy-node -v -b -o dist --source-folder=app --version-file=version.json",
-    "snapshot": "sh deploy/build.sh && sh deploy/copy_to_atvulicl9.sh",
-    "package:snapshot": "deploy-node -v -b -o dist --source-folder=app --version-file=version.json --timestamp",
-    "check-config": "node config/checkConfigChanges.js"
+    "sequelize": "^5.8.5",
+    "umzug": "^2.2.0"
   },
   "devDependencies": {
-    "aglio": "^2.3.0",
-    "cases": "0.0.2",
-    "chai": "~1.9.1",
-    "eyes": "^0.1.8",
-    "istanbul": "^0.4.2",
-    "mocha": "~2.3.4",
-    "should": "^8.1.0",
-    "sinon": "~1.9.1",
-    "supertest": "~0.10.0",
-    "supertest-session": "0.0.1"
+    "mysql2": "^1.6.5"
   }
 }
