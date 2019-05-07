@@ -13,10 +13,10 @@ Install it like this:
 
 ## Basic usage
 
-In your node backend application, call the *execute* method on startup and only after the method's returned promise
+In your node backend application, call the `execute` method on startup and only after the method's returned promise
 is resolved, continue starting up your application. 
 
-The execute method will return a Promise. It resolves into a Boolean indicating if any migration had to be executed. So the possible resolutions of the returned Promise are:
+The `execute` method will return a Promise. It resolves into a Boolean indicating if any migration had to be executed. So the possible resolutions of the returned Promise are:
 
 * resolved: `true` ... database has not been up to date, at least one migration was actually executed
 * resolved: `false` ... database has already been up to date, no migratio executed
@@ -34,12 +34,17 @@ const migrate = require("auto-mysql=umzug")({
   
   // migrate db if it is not up to date
   migrate.execute()
-    .then(() => {
-      logger.info(`migration was successful`);
-      startApp(); // at this point - after successful migration - start your application
+    .then((somethingHappened) => {
+        if (somethingHappened) {
+            console.log(`migration was successful`);
+        } else {
+            console.log(`no migration necessary`);
+        }
+
+        startApp(); // at this point - after successful migration - start your application
     })
     .catch(err => {
-      logger.error(`error at migration: ${err}`);
+      console.log(`error at migration: ${err}`);
 
       // don't start application
       process.exit(1);
