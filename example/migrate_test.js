@@ -9,8 +9,12 @@ const migrate = require('../index')({
 
 // first, migrate db if it is not up to date
 migrate.execute()
-    .then(() => {
-        console.log(`migration was sucessful`);
+    .then((somethingHappened) => {
+        if (somethingHappened) {
+            console.log(`migration was successful`);
+        } else {
+            console.log(`no migration necessary`);
+        }
         process.exit(0);
     })
     .catch(err => {

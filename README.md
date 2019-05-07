@@ -16,7 +16,13 @@ Install it like this:
 In your node backend application, call the *execute* method on startup and only after the method's returned promise
 is resolved, continue starting up your application. 
 
-Like this:
+The execute method will return a Promise. It resolves into a Boolean indicating if any migration had to be executed. So the possible resolutions of the returned Promise are:
+
+* resolved: `true` ... database has not been up to date, at least one migration was actually executed
+* resolved: `false` ... database has already been up to date, no migratio executed
+* rejected ...  an error occurred
+
+Usage example:
 
 ```js
 // before starting the app, perform database migration steps, if any

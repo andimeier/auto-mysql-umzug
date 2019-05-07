@@ -118,8 +118,10 @@ function execute() {
             if (migrations && migrations.length) {
                 let listOfMigrations = migrations.map(m => `  * ${m.file}`).join('\n');
                 console.log(`the following migrations have been executed:\n${listOfMigrations}`);
+                return Promise.resolve(true);
             } else {
                 console.log('database structure is up to date, no migrations executed.');
+                return Promise.resolve(false);
             }
         });
 }
