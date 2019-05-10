@@ -26,29 +26,29 @@ Usage example:
 
 ```js
 // before starting the app, perform database migration steps, if any
-const migrate = require("auto-mysql=umzug")({
+const migrate = require("auto-mysql-umzug")({
     dbName: DB_DATABASE,
     dbUser: DB_USER,
     dbPass: DB_PASSWORD
   });
   
-  // migrate db if it is not up to date
-  migrate.execute()
-    .then((somethingHappened) => {
-        if (somethingHappened) {
-            console.log(`migration was successful`);
-        } else {
-            console.log(`no migration necessary`);
-        }
+// migrate db if it is not up to date
+migrate.execute()
+.then((somethingHappened) => {
+	if (somethingHappened) {
+		console.log(`migration was successful`);
+	} else {
+		console.log(`no migration necessary`);
+	}
 
-        startApp(); // at this point - after successful migration - start your application
-    })
-    .catch(err => {
-      console.log(`error at migration: ${err}`);
+	startApp(); // at this point - after successful migration - start your application
+})
+.catch(err => {
+  console.log(`error at migration: ${err}`);
 
-      // don't start application
-      process.exit(1);
-    });
+  // don't start application
+  process.exit(1);
+});
 ```
 
 ## Configuration
@@ -65,6 +65,28 @@ The possible options are:
 * `dbOptions` ... an object containing additional database options. These options are passed through to [Sequelize](https://github.com/sequelize/sequelize) backend, so all options which are understood by *Sequelize*'s options property for the constructor are possible.
 * `migrationDir` ... folder containing the migration files associated with the software version (see [umzug](https://www.npmjs.com/package/umzug) for details on migration files). It can be an absolute or relative path. In case of a relative path, it will be resolved relative to the application's main folder (`path.dirname(require.main.filename)`).  set the name of the directory which contains the migration files. If not set, the default name for the migration folder is `migrations`.
 * `migrationTable` ... name of the table which stores the executed migrations. Default is `_migrations`.
+
+## Migration files
+
+The migrations folder (default: folder `migrations/`) contains the migration files. Each migration file is a Javascript file which ideally contains an up and a down method, which represent a function which achieves the task and a function that reverts a task. See [umzug:migration files:format](https://www.npmjs.com/package/umzug#format) for details.
+
+Note that the migration files are executed in the order of their filenames (sorted alphabetically). So, make sure that you either use a fixed-length numeric prefix or a timestamp (in a specific format).
+
+When missing migrations are detected, all missing migrations are executed in the alphabetic order of their filenames.
+
+Examples of migration files are:
+
+<pre>001-create-user-table.js
+002-add-some-columns.js
+003-other-things.js</pre>
+
+or:
+
+<pre>2019-05-10_153731-create-user-table.js
+2019-05-12_164004-add-some-columns.js
+2019-05-13_081445-other-things.js</pre>
+
+whatever you choose, be sure to stick to your chosen nomenclature consistently.
 
 ## Mysql driver
 
