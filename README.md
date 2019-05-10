@@ -20,13 +20,13 @@ The `execute` method will return a Promise. It resolves into a Boolean indicatin
 
 * resolved: `true` ... database has not been up to date, at least one migration was actually executed
 * resolved: `false` ... database has already been up to date, no migratio executed
-* rejected ...  an error occurred
+* rejected: ...  an error occurred
 
 Usage example:
 
 ```js
 // before starting the app, perform database migration steps, if any
-const migrate = require("auto-mysql-umzug")({
+const migrate = require('auto-mysql-umzug')({
     dbName: DB_DATABASE,
     dbUser: DB_USER,
     dbPass: DB_PASSWORD
@@ -34,26 +34,26 @@ const migrate = require("auto-mysql-umzug")({
   
 // migrate db if it is not up to date
 migrate.execute()
-.then((somethingHappened) => {
-	if (somethingHappened) {
-		console.log(`migration was successful`);
-	} else {
-		console.log(`no migration necessary`);
-	}
+  .then((somethingHappened) => {
+    if (somethingHappened) {
+      console.log('migration was successful');
+    } else {
+      console.log('no migration necessary');
+    }
 
-	startApp(); // at this point - after successful migration - start your application
-})
-.catch(err => {
-  console.log(`error at migration: ${err}`);
+    startApp(); // at this point - after successful migration - start your application
+  })
+  .catch(err => {
+    console.log(`error at migration: ${err}`);
 
-  // don't start application
-  process.exit(1);
-});
+    // don't start application
+    process.exit(1);
+  });
 ```
 
 ## Configuration
 
-You can pass a config object to the lib. It *must* contain the database credentials (`dbName`, `dbUser`, `dbPass` and optional additional options). Additionally, the option `migrationDir` can be included to
+You can pass a config object to the lib. It *must* contain the database credentials (`dbName`, `dbUser`, `dbPass` and optional additional options). Additionally, the option `migrationDir` can be included too.
 
 The database table in which the installed migrations are being tracked, is called `_migrations`.
 
@@ -62,8 +62,8 @@ The possible options are:
 * `dbName` ... name of the database
 * `dbUser` ... username of the database user. User must have the necessary privileges to alter the database. For instance, the user must be allowed to create the migrations metadata table - and every migration you will create.
 * `dbPass` ... password of the database user
-* `dbOptions` ... an object containing additional database options. These options are passed through to [Sequelize](https://github.com/sequelize/sequelize) backend, so all options which are understood by *Sequelize*'s options property for the constructor are possible.
-* `migrationDir` ... folder containing the migration files associated with the software version (see [umzug](https://www.npmjs.com/package/umzug) for details on migration files). It can be an absolute or relative path. In case of a relative path, it will be resolved relative to the application's main folder (`path.dirname(require.main.filename)`).  set the name of the directory which contains the migration files. If not set, the default name for the migration folder is `migrations`.
+* `dbOptions` ... an object containing additional database options. These options are passed through to [Sequelize](https://github.com/sequelize/sequelize) backend, so all options which are understood by *Sequelize*'s options property for the constructor are possible (see [here](http://docs.sequelizejs.com/class/lib/sequelize.js~Sequelize.html#instance-constructor-constructor)).
+* `migrationDir` ... folder containing the migration files associated with the software version (see [umzug](https://www.npmjs.com/package/umzug) for details on migration files). It can be an absolute or relative path. In case of a relative path, it will be resolved relative to the application's main folder (`path.dirname(require.main.filename)`).  set the name of the directory which contains the migration files. Default is `migrations`.
 * `migrationTable` ... name of the table which stores the executed migrations. Default is `_migrations`.
 
 ## Migration files
@@ -76,17 +76,17 @@ When missing migrations are detected, all missing migrations are executed in the
 
 Examples of migration files are:
 
-<pre>001-create-user-table.js
-002-add-some-columns.js
-003-other-things.js</pre>
+    001-create-user-table.js
+    002-add-some-columns.js
+    003-other-things.js
 
 or:
 
-<pre>2019-05-10_153731-create-user-table.js
-2019-05-12_164004-add-some-columns.js
-2019-05-13_081445-other-things.js</pre>
+    2019-05-10_153731-create-user-table.js
+    2019-05-12_164004-add-some-columns.js
+    2019-05-13_081445-other-things.js
 
-whatever you choose, be sure to stick to your chosen nomenclature consistently.
+Whatever you choose, be sure to stick to your chosen nomenclature consistently, to ensure that the sort order is as intended.
 
 ## Mysql driver
 

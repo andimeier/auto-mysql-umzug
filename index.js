@@ -41,7 +41,8 @@ let sequelize;
  * initialize Sequelize
  * 
  * @param opt {object} config object, consisiting of: { dbName, dbUser, dbPass} and 
- *    any additional options which are known to Sequelize's constructur
+ *    any additional options (property dbOptions which is an object) which will be interpreted
+ *    by Sequelize's constructur.
  */
 function initSequelize(opt) {
 
