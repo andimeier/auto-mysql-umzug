@@ -86,7 +86,14 @@ or:
     2019-05-12_164004-add-some-columns.js
     2019-05-13_081445-other-things.js
 
-Whatever you choose, be sure to stick to your chosen nomenclature consistently, to ensure that the sort order is as intended.
+Whatever you choose, be sure to stick to your chosen nomenclature consistently to ensure that the sort order is as intended.
+
+The arguments to the migration methods (`up()` and `down()`) are configured in this lib using Umzug's `migrations.params` property. All properties listed under `migrations.params` are passed to the migration files' methods. In this case, each migration method will be called with two parameters:
+
+* `query` ... Sequelize's query object (which is what `Sequelize.getQueryInterface()` returns), see [Sequelize/QueryInterface](http://docs.sequelizejs.com/class/lib/query-interface.js~QueryInterface.html) for the API
+* `DataTypes` ... Sequelize's constructor, see [Sequelize/DataTypes](http://docs.sequelizejs.com/variable/index.html#static-variable-DataTypes) for a description of Sequelize's data types
+
+
 
 ## Mysql driver
 
