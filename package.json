@@ -1,7 +1,7 @@
 {
   "name": "auto-mysql-umzug",
   "description": "Small wrapper to integrate umzug as easy as possible in your app",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Alexander Eck-Zimmer",
   "main": "index.js",
   "repository": {
