@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Changelog file
-- Options for a file pattern and logging to the initializer function
-- Function `needsDowngrade` to check for a probably missed downgrade
+- Options for a custom file pattern and logging to the initializer function
+- Function `needsDowngrade` to check for a probably missed database downgrade
 
 ### Changed
 - Function `execute` to check for a probably missed downgrade via `needsDowngrade` and rejects the promise if a downgrade is probably needed

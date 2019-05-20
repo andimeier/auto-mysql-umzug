@@ -9,8 +9,8 @@ const migrate = require('../index')({
 
 // first, migrate db if it is not up to date
 migrate.execute()
-    .then((somethingHappened) => {
-        if (somethingHappened) {
+    .then((executedMigrations) => {
+        if (executedMigrations.length) {
             console.log(`migration was successful`);
         } else {
             console.log(`no migration necessary`);
