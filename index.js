@@ -46,8 +46,8 @@ let sequelize;
  * @param {string} [opt.migrationDir] - Optionally a different migration directory. Defaults to `migrations`
  * @param {string} [opt.migrationTable] - The table to store the executed migrations. Defaults to `_migrations`
  * @param {RegExp} [opt.filePattern] - The pattern to search for files in the migrations directory. Defaults to `/\.js$/`
- * @param {function} [opt.logging] - Your logger of choice. This is called like the inbuilt `console.log()` method.
- *      If not specified, the inbuilt `console.log()` will be used
+ * @param {function|boolean} [opt.logging] - Your logger of choice. This is called like the inbuilt `console.log()` method.
+ *      If it is strictly `true`, the inbuilt `console.log()` will be used, otherwise nothing will be logged
  * @param {object} [opt.dbOptions] - Any options to pass to Sequelize's constructor
  */
 function init(opt) {
@@ -63,8 +63,8 @@ function init(opt) {
     if (!opt.dbPass) {
         throw new Error('missing mandatory config parameter dbPass');
     }
-    if (typeof opt.logging !== 'function') {
-        throw new TypeError('Property "opt.logging" has to be a function');
+    if ('logging' in opt && typeof opt.logging !== 'function' && typeof opt.logging !== 'boolean') {
+        throw new TypeError('Property "opt.logging" has to be a function or boolean');
     }
 
     // overwrite default options
@@ -102,9 +102,9 @@ function init(opt) {
             pattern: opt.filePattern || /\.js$/
         },
 
-        logging: opt.logging || function () {
+        logging: opt.logging || (opt.logging === true && function () {
             console.log.apply(null, arguments);
-        }
+        })
     });
 
 
