@@ -116,7 +116,7 @@ Note that the migration files are executed in the order of their filenames (sort
 
 When missing migrations are detected, all missing migrations are executed in the alphabetic order of their filenames.
 
-Examples of migration files are:
+Examples of migration file filenames are:
 
     001-create-user-table.js
     002-add-some-columns.js
