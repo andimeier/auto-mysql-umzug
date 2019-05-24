@@ -173,7 +173,7 @@ function needsDowngrade() {
         .then(fixMigrationPath)
         .then((migrations) => {
             if (migrations && migrations.length) {
-                migrations = migrations.filter((m) => !fs.existsSync(m));
+                migrations = migrations.filter((m) => !fs.existsSync(m.path));
                 return migrations.length ? migrations : false;
             } else {
                 return [];
@@ -191,7 +191,8 @@ function fixMigrationPath(migrations) {
     if (!Array.isArray(migrations)) migrations = [migrations];
 
     return migrations.map((migration) => {
-        if (migration instanceof umzug.Migration)
+        // check if it has the properties of umzug.Migration, as this class is not exposed
+        if (migration.file && migration.path && migration.__proto__.constructor.name === 'Migration')
             migration.path = path.resolve(migrationDir, migration.file);
 
         return migration;

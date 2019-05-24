@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   If `true`, it logs with `console.log`. Otherwise (`false` or not provided), logging is turned off.
 
 ## Fixed
-- The returned Migration instances had an incorrect path
-- `execute()` now doesn't expect an object anymore, even if it were empty
+- The returned [`umzug.Migration`](https://github.com/sequelize/umzug/blob/master/src/migration.js) instances had an incorrect path
+- `execute()` doesn't expect an object anymore, even if it were empty
+- `needsDowngrade()` doesn't return all migration files every time anymore
 
 ## [0.0.6] - 2019-05-24
 ### Added
@@ -20,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Function `needsDowngrade` to check for a probably missed database downgrade
 
 ### Changed
-- Function `execute` to check for a probably missed downgrade via `needsDowngrade` and rejects the promise if a downgrade is probably needed
+- Function `execute` checks for a probably missed downgrade via `needsDowngrade` and rejects the promise if a downgrade is probably needed
 - A parameter to function `execute` to disable downgrade checking: `options.ignoreMissingMigrations`
 - No function now logs directly to `console.log`
 - Readme to reflect changes and provide more details to the provided API

@@ -66,7 +66,7 @@ The possible options are:
 | `migrationDir` | `string` | `"migrations"` | &#10060; | Folder containing the migration files associated with the software version (see [umzug](https://www.npmjs.com/package/umzug) for details on migration files). It can be an absolute or relative path. In case of a relative path, it will be resolved relative to the application's main folder (`path.dirname(require.main.filename)`).  set the name of the directory which contains the migration files. Default is `migrations`. |
 | `migrationTable` | `string` | `"_migrations"` | &#10060; | Name of the table which stores the executed migrations. Default is `_migrations`. |
 | `filePattern` | `RegExp` | `/\.js$/` | &#10060; | Regular expression to search for migration files in `migrationDir` |
-| `logging` | `function` | `console.log` | &#10060; | Function that logs its arguments. It is called like the inbuilt function `console.log` |
+| `logging` | `function\|boolean` |  | &#10060; | Function that logs its arguments. It is called like the inbuilt function `console.log`. If `true`, uses `console.log`, otherwise nothing will be logged |
 
 ## API after initialization
 
