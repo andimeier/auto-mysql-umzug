@@ -69,7 +69,7 @@ function init(opt) {
 
     // overwrite default options
 
-    migrationDir = path.resolve(opt.migrationDir || migrationDir);
+    migrationDir = path.resolve(path.dirname(require.main.filename), (opt.migrationDir || migrationDir));
 
     dbOptions = Object.assign(dbOptions, (opt.dbOptions || {}));
 
