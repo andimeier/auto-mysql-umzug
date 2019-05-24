@@ -1,7 +1,7 @@
 # auto-mysql-umzug
 
 This lib is a small wrapper around the migration lib [umzug](https://www.npmjs.com/package/umzug). 
-It's intention is to integrate *umzug* as easy as possible into a node backend.
+It's intention is to integrate *umzug* as easily as possible into a node backend.
 The main use case is to provide an easy way to perform necessary database migrations automatically on 
 startup of a node backend.
 
