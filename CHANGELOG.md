@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- While initializing the parameter `opt.logging` is no longer mandatory and now also accepts `false` and `true`. 
+  If `true`, it logs with `console.log`. Otherwise (`false` or not provided), logging is turned off.
+
+## Fixed
+- The returned [`umzug.Migration`](https://github.com/sequelize/umzug/blob/master/src/migration.js) instances had an incorrect path
+- `execute()` doesn't expect an object anymore, even if it were empty
+- `needsDowngrade()` doesn't return all migration files every time anymore
+
 ## [0.0.6] - 2019-05-24
 ### Added
 - Changelog file
@@ -11,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Function `needsDowngrade` to check for a probably missed database downgrade
 
 ### Changed
-- Function `execute` to check for a probably missed downgrade via `needsDowngrade` and rejects the promise if a downgrade is probably needed
+- Function `execute` checks for a probably missed downgrade via `needsDowngrade` and rejects the promise if a downgrade is probably needed
 - A parameter to function `execute` to disable downgrade checking: `options.ignoreMissingMigrations`
 - No function now logs directly to `console.log`
 - Readme to reflect changes and provide more details to the provided API

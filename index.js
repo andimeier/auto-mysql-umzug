@@ -46,8 +46,8 @@ let sequelize;
  * @param {string} [opt.migrationDir] - Optionally a different migration directory. Defaults to `migrations`
  * @param {string} [opt.migrationTable] - The table to store the executed migrations. Defaults to `_migrations`
  * @param {RegExp} [opt.filePattern] - The pattern to search for files in the migrations directory. Defaults to `/\.js$/`
- * @param {function} [opt.logging] - Your logger of choice. This is called like the inbuilt `console.log()` method.
- *      If not specified, the inbuilt `console.log()` will be used
+ * @param {function|boolean} [opt.logging] - Your logger of choice. This is called like the inbuilt `console.log()` method.
+ *      If it is strictly `true`, the inbuilt `console.log()` will be used, otherwise nothing will be logged
  * @param {object} [opt.dbOptions] - Any options to pass to Sequelize's constructor
  */
 function init(opt) {
@@ -63,8 +63,8 @@ function init(opt) {
     if (!opt.dbPass) {
         throw new Error('missing mandatory config parameter dbPass');
     }
-    if (typeof opt.logging !== 'function') {
-        throw new TypeError('Property "opt.logging" has to be a function');
+    if ('logging' in opt && typeof opt.logging !== 'function' && typeof opt.logging !== 'boolean') {
+        throw new TypeError('Property "opt.logging" has to be a function or boolean');
     }
 
     // overwrite default options
@@ -102,9 +102,9 @@ function init(opt) {
             pattern: opt.filePattern || /\.js$/
         },
 
-        logging: opt.logging || function () {
+        logging: opt.logging || (opt.logging === true && function () {
             console.log.apply(null, arguments);
-        }
+        })
     });
 
 
@@ -129,7 +129,7 @@ function init(opt) {
  */
 function execute(options) {
     let prom;
-    if (options.ignoreMissingMigrations) {
+    if (options && options.ignoreMissingMigrations) {
         prom = umzug.up();
     } else {
         prom = needsDowngrade()
@@ -142,7 +142,7 @@ function execute(options) {
                 }
             });
     }
-    return prom;
+    return prom.then(fixMigrationPath);
 }
 
 
@@ -154,12 +154,14 @@ function execute(options) {
  */
 function needsUpdate() {
     // directly return the pending migrations
-    return umzug.pending((migrations) => {
-        if (!migrations || !migrations.length) {
-            migrations = [];
-        }
-        return migrations;
-    });
+    return umzug
+        .pending((migrations) => {
+            if (!migrations || !migrations.length) {
+                migrations = [];
+            }
+            return migrations;
+        })
+        .then(fixMigrationPath);
 }
 
 /**
@@ -168,14 +170,33 @@ function needsUpdate() {
  */
 function needsDowngrade() {
     return umzug.executed()
+        .then(fixMigrationPath)
         .then((migrations) => {
             if (migrations && migrations.length) {
-                migrations = migrations.filter((m) => !fs.existsSync(m));
+                migrations = migrations.filter((m) => !fs.existsSync(m.path));
                 return migrations.length ? migrations : false;
             } else {
                 return [];
             }
         });
+}
+
+/**
+ * Fix the set path on Migration instances to point to the correct path
+ * @param {umzug.Migration[]} migrations
+ * @return {umzug.Migration[]}
+ */
+function fixMigrationPath(migrations) {
+    if (!migrations) return migrations;
+    if (!Array.isArray(migrations)) migrations = [migrations];
+
+    return migrations.map((migration) => {
+        // check if it has the properties of umzug.Migration, as this class is not exposed
+        if (migration.file && migration.path && migration.__proto__.constructor.name === 'Migration')
+            migration.path = path.resolve(migrationDir, migration.file);
+
+        return migration;
+    });
 }
 
 // directly return init func to pull JSDoc with it
