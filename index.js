@@ -69,7 +69,7 @@ function init(opt) {
 
     // overwrite default options
 
-    migrationDir = path.resolve(path.dirname(require.main.filename), (opt.migrationDir || migrationDir));
+    migrationDir = path.resolve(opt.migrationDir || migrationDir);
 
     dbOptions = Object.assign(dbOptions, (opt.dbOptions || {}));
 
@@ -129,7 +129,7 @@ function init(opt) {
  */
 function execute(options) {
     let prom;
-    if (options.ignoreMissingMigrations) {
+    if (options && options.ignoreMissingMigrations) {
         prom = umzug.up();
     } else {
         prom = needsDowngrade()
@@ -142,7 +142,7 @@ function execute(options) {
                 }
             });
     }
-    return prom;
+    return prom.then(fixMigrationPath);
 }
 
 
@@ -154,12 +154,14 @@ function execute(options) {
  */
 function needsUpdate() {
     // directly return the pending migrations
-    return umzug.pending((migrations) => {
-        if (!migrations || !migrations.length) {
-            migrations = [];
-        }
-        return migrations;
-    });
+    return umzug
+        .pending((migrations) => {
+            if (!migrations || !migrations.length) {
+                migrations = [];
+            }
+            return migrations;
+        })
+        .then(fixMigrationPath);
 }
 
 /**
@@ -168,6 +170,7 @@ function needsUpdate() {
  */
 function needsDowngrade() {
     return umzug.executed()
+        .then(fixMigrationPath)
         .then((migrations) => {
             if (migrations && migrations.length) {
                 migrations = migrations.filter((m) => !fs.existsSync(m));
@@ -176,6 +179,23 @@ function needsDowngrade() {
                 return [];
             }
         });
+}
+
+/**
+ * Fix the set path on Migration instances to point to the correct path
+ * @param {umzug.Migration[]} migrations
+ * @return {umzug.Migration[]}
+ */
+function fixMigrationPath(migrations) {
+    if (!migrations) return migrations;
+    if (!Array.isArray(migrations)) migrations = [migrations];
+
+    return migrations.map((migration) => {
+        if (migration instanceof umzug.Migration)
+            migration.path = path.resolve(migrationDir, migration.file);
+
+        return migration;
+    });
 }
 
 // directly return init func to pull JSDoc with it

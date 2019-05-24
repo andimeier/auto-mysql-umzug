@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - While initializing the parameter `opt.logging` is no longer mandatory and now also accepts `false` and `true`. 
   If `true`, it logs with `console.log`. Otherwise (`false` or not provided), logging is turned off.
 
+## Fixed
+- The returned Migration instances had an incorrect path
+- `execute()` now doesn't expect an object anymore, even if it were empty
+
 ## [0.0.6] - 2019-05-24
 ### Added
 - Changelog file
