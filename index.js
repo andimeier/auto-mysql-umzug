@@ -134,7 +134,7 @@ function execute(options) {
     } else {
         prom = needsDowngrade()
             .then((result) => {
-                if (result === false) {
+                if (!result.length) {
                     return umzug.up();
                 } else {
                     return Promise.reject(`There are recorded migrations but the corresponding files were not found. ` +
@@ -174,7 +174,7 @@ function needsDowngrade() {
         .then((migrations) => {
             if (migrations && migrations.length) {
                 migrations = migrations.filter((m) => !fs.existsSync(m.path));
-                return migrations.length ? migrations : false;
+                return migrations;
             } else {
                 return [];
             }
