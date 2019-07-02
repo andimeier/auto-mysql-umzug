@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   If `true`, it logs with `console.log`. Otherwise (`false` or not provided), logging is turned off.
 
 ## Fixed
+- Inconsistent return value from `needsDowngrade()`
 - The returned [`umzug.Migration`](https://github.com/sequelize/umzug/blob/master/src/migration.js) instances had an incorrect path
 - `execute()` doesn't expect an object anymore, even if it were empty
 - `needsDowngrade()` doesn't return all migration files every time anymore
