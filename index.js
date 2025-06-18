@@ -11,7 +11,7 @@
  */
 
 /** */
-const Umzug = require('umzug');
+const { Umzug } = require('umzug');
 const Sequelize = require('sequelize');
 const path = require('path');
 const fs = require('fs');
@@ -32,6 +32,7 @@ let dbOptions = {
     logging: false
 };
 
+/** @type {import("umzug").Umzug} */
 let umzug;
 let sequelize;
 
@@ -116,14 +117,13 @@ function init(opt) {
     };
 }
 
-
 /**
  * Execute all necessary db migrations
  * Also checks, if a possible downgrade is needed
  *
  * @param {object} [options] - Some options to configure
  * @param {boolean} [options.ignoreMissingMigrations] - If `true`, it won't check for missing but already executed migration files
- * @return {Promise<Migration[]>} resolves on successful migrations with the executed migrations (or non if non were executed), rejects on error
+ * @return {Promise<import("umzug").MigrationMeta[]>} resolves on successful migrations with the executed migrations (or non if non were executed), rejects on error
  * @see needsDowngrade
  * @see umzug.up
  */
@@ -132,48 +132,46 @@ function execute(options) {
     if (options && options.ignoreMissingMigrations) {
         prom = umzug.up();
     } else {
-        prom = needsDowngrade()
-            .then((result) => {
-                if (!result.length) {
-                    return umzug.up();
-                } else {
-                    return Promise.reject(`There are recorded migrations but the corresponding files were not found. ` +
-                        `You probably need to downgrade! Missing migration files: [${result.map((m) => m.file).join(', ')}]`);
-                }
-            });
+        prom = needsDowngrade().then((result) => {
+            if (!result.length) {
+                return umzug.up();
+            } else {
+                return Promise.reject(
+                    `There are recorded migrations but the corresponding files were not found. ` +
+                    `You probably need to downgrade! Missing migration files: [${result
+                        .map((m) => m.name)
+                        .join(", ")}]`
+                    );
+            }
+        });
     }
     return prom.then(fixMigrationPath);
 }
-
 
 /**
  * Returns the pending migrations (migrations that are defined in the migrations folder,
  * but are not applied yet according to the info from the migrations table)
  *
- * @return {Promise<Migration[]>} - The pending migrations
+ * @return {Promise<import("umzug").MigrationMeta[]>} - The pending migrations
  */
 function needsUpdate() {
     // directly return the pending migrations
-    return umzug
-        .pending((migrations) => {
-            if (!migrations || !migrations.length) {
-                migrations = [];
-            }
-            return migrations;
-        })
-        .then(fixMigrationPath);
+    return umzug.pending().then(fixMigrationPath);
 }
 
 /**
  * Checks if there are registered migrations that do not exist on disk.
- * @return {Promise<Migration[]>} - the missing migrations as array in a resolved promise
+ * @return {Promise<import("umzug").MigrationMeta[]>} - the missing migrations as array in a resolved promise
  */
 function needsDowngrade() {
-    return umzug.executed()
+    return umzug
+        .executed()
         .then(fixMigrationPath)
         .then((migrations) => {
             if (migrations && migrations.length) {
-                migrations = migrations.filter((m) => !fs.existsSync(m.path));
+                migrations = migrations.filter(
+                    (m) => !m.path || !fs.existsSync(m.path)
+                );
                 return migrations;
             } else {
                 return [];
@@ -183,16 +181,16 @@ function needsDowngrade() {
 
 /**
  * Fix the set path on Migration instances to point to the correct path
- * @param {umzug.Migration[]} migrations
- * @return {umzug.Migration[]}
+ * @param {import("umzug").MigrationMeta[]} migrations
+ * @return {import("umzug").MigrationMeta[]}
  */
 function fixMigrationPath(migrations) {
     if (!migrations) return migrations;
     if (!Array.isArray(migrations)) migrations = [migrations];
 
     return migrations.map((migration) => {
-        // check if it has the properties of umzug.Migration, as this class is not exposed
-        if (migration.file && migration.path && migration.__proto__.constructor.name === 'Migration')
+        // check if it has the required properties
+        if (migration.file && migration.path)
             migration.path = path.resolve(migrationDir, migration.file);
 
         return migration;
